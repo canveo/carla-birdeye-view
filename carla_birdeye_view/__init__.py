@@ -208,7 +208,6 @@ class BirdViewProducer:
         # Reusing already generated static masks for whole map
         self.masks_generator.disable_local_rendering_mode()
         agent_global_px_pos = self.masks_generator.location_to_pixel(agent_vehicle_loc)
-
         cropping_rect = CroppingRect(
             x=int(agent_global_px_pos.x - self.rendering_area.width / 2),
             y=int(agent_global_px_pos.y - self.rendering_area.height / 2),
@@ -233,7 +232,6 @@ class BirdViewProducer:
         masks[BirdViewMasks.CENTERLINES.value] = self.full_centerlines_cache[
             cropping_rect.vslice, cropping_rect.hslice
         ]
-
         # Dynamic masks
         rendering_window = RenderingWindow(
             origin=agent_vehicle_loc, area=self.rendering_area

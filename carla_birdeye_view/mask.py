@@ -5,7 +5,7 @@ from typing import NamedTuple, List, Tuple, Optional
 from carla_birdeye_view import lanes
 from cv2 import cv2 as cv
 from carla_birdeye_view.lanes import LaneSide
-
+import math
 Mask = np.ndarray  # of shape (y, x), stores 0 and 1, dtype=np.int32
 RoadSegmentWaypoints = List[carla.Waypoint]
 
@@ -139,22 +139,18 @@ class MapMaskGenerator:
         """
         min_x = self._map_boundaries.min_x
         min_y = self._map_boundaries.min_y
-
         # Pixel coordinates on full map
         x = int(self.pixels_per_meter * (loc.x - min_x))
         y = int(self.pixels_per_meter * (loc.y - min_y))
-
         if self.rendering_window is not None:
             # global rendering area coordinates
             origin_x = self.pixels_per_meter * (self.rendering_window.origin.x - min_x)
             origin_y = self.pixels_per_meter * (self.rendering_window.origin.y - min_y)
             topleft_x = int(origin_x - self.rendering_window.area.width / 2)
             topleft_y = int(origin_y - self.rendering_window.area.height / 2)
-
             # x, y becomes local coordinates within rendering window
             x -= topleft_x
             y -= topleft_y
-
         return Coord(x=int(x), y=int(y))
 
     def make_empty_mask(self) -> Mask:
@@ -306,6 +302,8 @@ class MapMaskGenerator:
                 continue
 
             bb = ped.bounding_box.extent
+            if math.isinf(bb.x) or math.isinf(bb.y):
+                continue
             corners = [
                 carla.Location(x=-bb.x, y=-bb.y),
                 carla.Location(x=bb.x, y=-bb.y),
